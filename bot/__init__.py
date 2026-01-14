@@ -70,6 +70,7 @@ if not ospath.isdir("encode/"):
     mkdir("encode/")
 if not ospath.isdir("thumbs/"):
     mkdir("thumbs/")
+
 if not ospath.isdir("downloads/"):
     mkdir("downloads/")
 
@@ -82,12 +83,13 @@ try:
         plugins=dict(root="bot/modules"), 
         parse_mode=ParseMode.HTML
     )
-    # Remove bot_loop = bot.loop
-    # Initialize Scheduler without an explicit loop (it will find it when started)
-    sch = AsyncIOScheduler(timezone="Asia/Kolkata") 
+    # REMOVE: bot_loop = bot.loop
+    # REMOVE: sch = AsyncIOScheduler(..., event_loop=bot_loop)
+    
+    # NEW: Just initialize the scheduler without passing a loop yet
+    sch = AsyncIOScheduler(timezone="Asia/Kolkata")
 except Exception as ee:
     LOGS.error(str(ee))
     exit(1)
             
-
 
