@@ -10,6 +10,9 @@ from bot import bot, Var, bot_loop, sch, LOGS, ffQueue, ffLock, ffpids_cache, ff
 from bot.core.auto_animes import fetch_animes
 from bot.core.func_utils import clean_up, new_task, editMessage
 from bot.modules.up_posts import upcoming_animes
+import asyncio # Ensure this is imported at the top
+
+    
 
 @bot.on_message(command('restart') & user(Var.ADMINS))
 @new_task
@@ -58,15 +61,24 @@ async def main():
     await restart()
     LOGS.info('Auto Anime Bot Started!')
     sch.start()
-    bot_loop.create_task(queue_loop())
+    
+    # Use asyncio.create_task instead of bot_loop.create_task
+    asyncio.create_task(queue_loop())
+    
     await fetch_animes()
     await idle()
+    
     LOGS.info('Auto Anime Bot Stopped!')
     await bot.stop()
-    for task in all_tasks:
+    
+    # Cleanup tasks
+    current_tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    for task in current_tasks:
         task.cancel()
+    
     await clean_up()
     LOGS.info('Finished AutoCleanUp !!')
     
 if __name__ == '__main__':
-    bot_loop.run_until_complete(main())
+    # Use the standard runner
+    asyncio.run(main())
