@@ -11,7 +11,7 @@ from bot.core.auto_animes import fetch_animes
 from bot.core.func_utils import clean_up, new_task, editMessage
 from bot.modules.up_posts import upcoming_animes
 import asyncio # Ensure this is imported at the top
-
+        
     
 
 @bot.on_message(command('restart') & user(Var.ADMINS))
@@ -55,14 +55,17 @@ async def queue_loop():
                 ffQueue.task_done()
         await asleep(10)
 
+
 async def main():
     sch.add_job(upcoming_animes, "cron", hour=0, minute=30)
     await bot.start()
     await restart()
     LOGS.info('Auto Anime Bot Started!')
+    
+    # The scheduler will now automatically find the running loop
     sch.start()
     
-    # Use asyncio.create_task instead of bot_loop.create_task
+    # Use asyncio instead of bot_loop
     asyncio.create_task(queue_loop())
     
     await fetch_animes()
@@ -71,14 +74,17 @@ async def main():
     LOGS.info('Auto Anime Bot Stopped!')
     await bot.stop()
     
-    # Cleanup tasks
-    current_tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-    for task in current_tasks:
-        task.cancel()
-    
+    # Proper cleanup of tasks
+    for task in all_tasks():
+        if task is not asyncio.current_task():
+            task.cancel()
+            
     await clean_up()
     LOGS.info('Finished AutoCleanUp !!')
     
 if __name__ == '__main__':
-    # Use the standard runner
-    asyncio.run(main())
+    # Use asyncio.run() to start everything
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
