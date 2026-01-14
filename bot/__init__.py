@@ -8,6 +8,9 @@ from pyrogram import Client
 from pyrogram.enums import ParseMode
 from dotenv import load_dotenv
 from uvloop import install
+# Remove 'bot_loop' from this import line
+from bot import bot, Var, sch, LOGS, ffpids_cache, ff_queued
+import bot  # Import the module to assign global variables
 
 install()
 basicConfig(format="[%(asctime)s] [%(name)s | %(levelname)s] - %(message)s [%(filename)s:%(lineno)d]",
@@ -27,8 +30,8 @@ ani_cache = {
 }
 ffpids_cache = list()
 
-ffLock = Lock()
-ffQueue = Queue()
+ffLock = None
+ffQueue = None
 ff_queued = dict()
 
 class Var:
