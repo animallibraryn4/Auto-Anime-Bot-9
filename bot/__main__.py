@@ -6,12 +6,15 @@ from os import path as ospath, execl, kill
 from sys import executable
 from signal import SIGKILL
 
-from bot import bot, Var, bot_loop, sch, LOGS, ffQueue, ffLock, ffpids_cache, ff_queued
+
 from bot.core.auto_animes import fetch_animes
 from bot.core.func_utils import clean_up, new_task, editMessage
 from bot.modules.up_posts import upcoming_animes
 import asyncio # Ensure this is imported at the top
-        
+# Remove 'bot_loop' from this import line
+from bot import bot, Var, sch, LOGS, ffpids_cache, ff_queued
+import bot  # Import the module to assign global variables
+
     
 
 @bot.on_message(command('restart') & user(Var.ADMINS))
@@ -55,15 +58,13 @@ async def queue_loop():
                 ffQueue.task_done()
         await asleep(10)
 
-
 async def main():
+    # Initialize the global Lock and Queue inside the loop
+    bot.ffLock = asyncio.Lock()
+    bot.ffQueue = asyncio.Queue()
+    
     sch.add_job(upcoming_animes, "cron", hour=0, minute=30)
     await bot.start()
-    await restart()
-    LOGS.info('Auto Anime Bot Started!')
-    
-    # The scheduler will now automatically find the running loop
-    sch.start()
     
     # Use asyncio instead of bot_loop
     asyncio.create_task(queue_loop())
@@ -88,3 +89,4 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         pass
+
