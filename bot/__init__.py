@@ -74,9 +74,20 @@ if not ospath.isdir("downloads/"):
     mkdir("downloads/")
 
 try:
-    bot = Client(name="AutoAniAdvance", api_id=Var.API_ID, api_hash=Var.API_HASH, bot_token=Var.BOT_TOKEN, plugins=dict(root="bot/modules"), parse_mode=ParseMode.HTML)
-    bot_loop = bot.loop
-    sch = AsyncIOScheduler(timezone="Asia/Kolkata", event_loop=bot_loop)
+    bot = Client(
+        name="AutoAniAdvance", 
+        api_id=Var.API_ID, 
+        api_hash=Var.API_HASH, 
+        bot_token=Var.BOT_TOKEN, 
+        plugins=dict(root="bot/modules"), 
+        parse_mode=ParseMode.HTML
+    )
+    # Remove bot_loop = bot.loop
+    # Initialize Scheduler without an explicit loop (it will find it when started)
+    sch = AsyncIOScheduler(timezone="Asia/Kolkata") 
 except Exception as ee:
     LOGS.error(str(ee))
     exit(1)
+            
+
+
